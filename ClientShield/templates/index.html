@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Supermarket Management System{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-lg-8 text-center">
+                <div class="welcome-card card border-0 bg-transparent">
+                    <div class="card-body">
+                        <div class="welcome-icon mx-auto mb-4">
+                            <i class="fas fa-store fa-3x text-primary"></i>
+                        </div>
+                        
+                        <h1 class="display-4 fw-bold mb-4 text-white">
+                            Supermarket Management System
+                        </h1>
+                        
+                        <p class="lead mb-5 text-light">
+                            Comprehensive solution for managing inventory, clients, and employees with advanced security features.
+                        </p>
+                        
+                        <div class="d-grid gap-3 d-md-block">
+                            {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg px-5 me-md-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if not current_user.is_authenticated %}
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 bg-dark border-secondary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-boxes fa-2x text-primary mb-3"></i>
+                                <h5 class="card-title">Inventory Management</h5>
+                                <p class="card-text text-muted">Track products, quantities, and pricing with real-time updates.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 bg-dark border-secondary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-2x text-success mb-3"></i>
+                                <h5 class="card-title">Client Management</h5>
+                                <p class="card-text text-muted">Maintain customer records and loyalty programs efficiently.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 bg-dark border-secondary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-shield-alt fa-2x text-warning mb-3"></i>
+                                <h5 class="card-title">Security Features</h5>
+                                <p class="card-text text-muted">Advanced protection against XSS, SQL injection, and other threats.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(13, 110, 253, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(25, 135, 84, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+</style>
+{% endblock %}

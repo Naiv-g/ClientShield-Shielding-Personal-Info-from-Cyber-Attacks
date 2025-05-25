@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Management - Supermarket Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-user-tie me-2 text-warning"></i>Employee Management</h1>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('main.add_employee') }}" class="btn btn-warning">
+        <i class="fas fa-user-plus me-2"></i>Add New Employee
+    </a>
+    {% endif %}
+</div>
+
+<!-- Search and Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                {{ search_form.query(class="form-control", placeholder="Search employees by name, username, or department...", value=query) }}
+            </div>
+            <div class="col-md-2">
+                <select name="sort_by" class="form-select">
+                    <option value="full_name" {% if sort_by == 'full_name' %}selected{% endif %}>Full Name</option>
+                    <option value="username" {% if sort_by == 'username' %}selected{% endif %}>Username</option>
+                    <option value="email" {% if sort_by == 'email' %}selected{% endif %}>Email</option>
+                    <option value="department" {% if sort_by == 'department' %}selected{% endif %}>Department</option>
+                    <option value="role" {% if sort_by == 'role' %}selected{% endif %}>Role</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="sort_order" class="form-select">
+                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                    <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results -->
+{% if employees %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Employee Directory</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Last Login</th>
+                        <th>Status</th>
+                        {% if current_user.role == 'admin' %}
+                        <th width="120">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>
+                            <strong>{{ employee.full_name }}</strong>
+                            <br><small class="text-muted">Member since: {{ employee.created_at | display_date }}</small>
+                        </td>
+                        <td>{{ employee.username }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.department or '-' }}</td>
+                        <td>
+                            {% if employee.role == 'admin' %}
+                                <span class="badge bg-danger">Administrator</span>
+                            {% elif employee.role == 'manager' %}
+                                <span class="badge bg-warning text-dark">Manager</span>
+                            {% else %}
+                                <span class="badge bg-primary">Employee</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if employee.last_login %}
+                                {{ employee.last_login | display_datetime }}
+                            {% else %}
+                                <span class="text-muted">Never</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if employee.account_locked %}
+                                <span class="badge bg-danger">Locked</span>
+                            {% else %}
+                                <span class="badge bg-success">Active</span>
+                            {% endif %}
+                        </td>
+                        {% if current_user.role == 'admin' %}
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('main.edit_employee', employee_id=employee.id) }}" 
+                                   class="btn btn-sm btn-outline-primary" 
+                                   data-bs-toggle="tooltip" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if employee.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('main.delete_employee', employee_id=employee.id) }}" 
+                                      class="d-inline" onsubmit="return confirm('Are you sure you want to delete this employee?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="tooltip" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.employees', page=pagination.prev_num, query=query, sort_by=sort_by, sort_order=sort_order) }}">Previous</a>
+            </li>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != pagination.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.employees', page=page_num, query=query, sort_by=sort_by, sort_order=sort_order) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.employees', page=pagination.next_num, query=query, sort_by=sort_by, sort_order=sort_order) }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
+        <h4>No employees found</h4>
+        <p class="text-muted">Try adjusting your search criteria{% if current_user.role == 'admin' %} or add new employees to the system{% endif %}.</p>
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('main.add_employee') }}" class="btn btn-warning">
+            <i class="fas fa-user-plus me-2"></i>Add First Employee
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

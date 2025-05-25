@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Supermarket Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="welcome-card card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="card-title mb-2">Welcome back, {{ current_user.full_name }}!</h1>
+                        <p class="card-text text-muted mb-0">
+                            Here's what's happening in your supermarket today.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="welcome-icon">
+                            <i class="fas fa-user-circle fa-3x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Total Items</h6>
+                        <h3 class="card-title mb-0">{{ inventory_count }}</h3>
+                    </div>
+                    <div class="text-primary">
+                        <i class="fas fa-boxes fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Total Clients</h6>
+                        <h3 class="card-title mb-0">{{ client_count }}</h3>
+                    </div>
+                    <div class="text-success">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Total Employees</h6>
+                        <h3 class="card-title mb-0">{{ employee_count }}</h3>
+                    </div>
+                    <div class="text-warning">
+                        <i class="fas fa-user-tie fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-subtitle mb-2 text-muted">Low Stock</h6>
+                        <h3 class="card-title mb-0">{{ low_stock|length }}</h3>
+                    </div>
+                    <div class="text-danger">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Low Stock Items -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Low Stock Items
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if low_stock %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in low_stock[:10] %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>
+                                        <span class="{% if item.quantity <= 5 %}very-low-stock-warning{% else %}low-stock-warning{% endif %}">
+                                            {{ item.quantity }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.quantity <= 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif item.quantity <= 5 %}
+                                            <span class="badge bg-warning">Critical</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Low</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if low_stock|length > 10 %}
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('main.inventory') }}?query=&category=all&sort_by=quantity&sort_order=asc" class="btn btn-outline-warning btn-sm">
+                                View All Low Stock Items
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">All items are well stocked!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Security Logs -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shield-alt text-info me-2"></i>
+                    Recent Security Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if security_logs %}
+                    {% for log in security_logs %}
+                        <div class="security-log-item {{ log.event_type }} mb-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ log.event_type.replace('_', ' ').title() }}</strong>
+                                    <p class="mb-0 text-muted small">{{ log.description }}</p>
+                                </div>
+                                <small class="text-muted">
+                                    {{ log.timestamp.strftime('%H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if current_user.role == 'admin' %}
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('main.security_logs') }}" class="btn btn-outline-info btn-sm">
+                                View All Security Logs
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-shield-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent security activity</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt text-primary me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('main.add_inventory') }}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                            <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                            <span>Add Item</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('main.add_client') }}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                            <i class="fas fa-user-plus fa-2x mb-2"></i>
+                            <span>Add Client</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('main.inventory') }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                            <i class="fas fa-search fa-2x mb-2"></i>
+                            <span>Search Items</span>
+                        </a>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('main.clients') }}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <span>View Clients</span>
+                        </a>
+                    </div>
+                    {% if current_user.role in ['admin', 'manager'] %}
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <a href="{{ url_for('main.employees') }}" class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                            <i class="fas fa-user-tie fa-2x mb-2"></i>
+                            <span>Employees</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Add Client - Supermarket Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus me-2 text-success"></i>Add New Client
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.first_name.label(class="form-label") }}
+                            {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.last_name.label(class="form-label") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), type="email") }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone.label(class="form-label") }}
+                            {{ form.phone(class="form-control", placeholder="Optional") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.address.label(class="form-label") }}
+                        {{ form.address(class="form-control", placeholder="Optional street address") }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.city.label(class="form-label") }}
+                            {{ form.city(class="form-control", placeholder="Optional") }}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.state.label(class="form-label") }}
+                            {{ form.state(class="form-control", placeholder="Optional") }}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.postal_code.label(class="form-label") }}
+                            {{ form.postal_code(class="form-control", placeholder="Optional") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.date_of_birth.label(class="form-label") }}
+                            {{ form.date_of_birth(class="form-control") }}
+                            <div class="form-text">Optional date of birth</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.loyalty_points.label(class="form-label") }}
+                            {{ form.loyalty_points(class="form-control", min="0") }}
+                            <div class="form-text">Starting loyalty points (default: 0)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="3", placeholder="Optional notes about the client") }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.clients') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Clients
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Add Client
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

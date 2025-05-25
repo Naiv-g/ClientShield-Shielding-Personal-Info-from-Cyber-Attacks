@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Employee - Supermarket Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-edit me-2 text-warning"></i>Edit Employee: {{ employee.full_name }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.full_name.label(class="form-label") }}
+                            {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else "")) }}
+                            {% if form.full_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.full_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), type="email") }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.department.label(class="form-label") }}
+                        {{ form.department(class="form-control", placeholder="Optional department") }}
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Username: {{ employee.username }} | Role: {{ employee.role.title() }} | Created: {{ employee.created_at.strftime('%Y-%m-%d') }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.employees') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Employees
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Update Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

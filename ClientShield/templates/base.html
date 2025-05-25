@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Supermarket Management System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-store me-2"></i>Supermarket CMS
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.inventory') }}">
+                            <i class="fas fa-boxes me-1"></i>Inventory
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.clients') }}">
+                            <i class="fas fa-users me-1"></i>Clients
+                        </a>
+                    </li>
+                    {% if current_user.role in ['admin', 'manager'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.employees') }}">
+                            <i class="fas fa-user-tie me-1"></i>Employees
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ current_user.full_name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('main.profile') }}">
+                                <i class="fas fa-user-edit me-2"></i>Profile
+                            </a></li>
+                            {% if current_user.role == 'admin' %}
+                            <li><a class="dropdown-item" href="{{ url_for('main.security_logs') }}">
+                                <i class="fas fa-shield-alt me-2"></i>Security Logs
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="{% if current_user.is_authenticated %}container my-4{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% if current_user.is_authenticated %}
+    <footer class="footer mt-auto py-3 bg-dark text-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Supermarket Management System. All rights reserved.</span>
+        </div>
+    </footer>
+    {% endif %}
+
+    <!-- Security Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="securityToast" class="toast security-toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-shield-alt text-danger me-2"></i>
+                <strong class="me-auto">Security Alert</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="securityToastMessage">
+                Security event detected.
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/security.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
