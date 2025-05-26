@@ -170,6 +170,5 @@ The application includes comprehensive testing for:
 
 ## 👨‍💻 Development Team
 
-- **Nakshatra Purohit** - Team Lead & Security Implementation
 - **Naivaidhya Garg** - Database Design & Client Management
 - **Devank Joshi** - Inventory System & Authentication
