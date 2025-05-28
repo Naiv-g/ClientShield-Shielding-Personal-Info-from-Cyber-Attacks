@@ -169,6 +169,6 @@ The application includes comprehensive testing for:
 - API development for third-party integrations
 
 ## 👨‍💻 Development Team
-
 - **Naivaidhya Garg** - Database Design & Client Management
 - **Devank Joshi** - Inventory System & Authentication
+- **Nakshatra Purohit**
